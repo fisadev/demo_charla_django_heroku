@@ -1,0 +1,40 @@
+<html>
+<meta>
+<script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+</meta>
+<body>
+    <h1>Gran Encuesta Gran!</h1>
+    {% for opcion in opciones %}
+        <p><button class="boton-opcion" data-opcion-id="{{opcion.id}}">{{ opcion.nombre }}</button> Respuestas: <span id="total-opcion-{{opcion.id}}">0</span></p>
+    {% endfor %}
+
+    <script>
+    function onOpcionClick() {
+        var idOpcionClickeada = $(this).data("opcion-id");
+        $("#total-opcion-" + idOpcionClickeada).text("votando...")
+        $.ajax({"url": "/api/responder/" + idOpcionClickeada + "/"});
+    }
+    $(".boton-opcion").on("click", onOpcionClick);
+
+    var spanTotales = $("#totales");
+
+    function actualizarTotales() {
+        $.ajax({"url": "/api/totales/"}).done(onTotalesRecividos);
+    }
+
+    function onTotalesRecividos(data) {
+        for (var prop in data.totales) {
+            if (data.totales.hasOwnProperty(prop)) {
+                $("#total-opcion-" + prop).text(data.totales[prop])
+            }
+        }
+    }
+
+    setInterval(actualizarTotales, 2000);
+    </script>
+
+</body>
+</html>
